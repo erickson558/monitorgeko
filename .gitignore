@@ -1,0 +1,10 @@
+# Runtime data and secrets (do not publish)
+data/*.json
+data/.secret
+
+# Keep directory structure
+!data/.gitkeep
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
