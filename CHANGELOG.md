@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.10] - 2026-03-06
+
+### Fixed
+- Improved Windows CPU correctness for localhost by selecting the highest valid sampled value between `Processor Time` and `Processor Utility`.
+- Reduced CPU underreporting cases where cards showed single digits while Task Manager showed high utilization.
+
+### Changed
+- Unified CPU selection logic across `pull_ssh` and Windows `push` agent for consistent readings.
+
 ## [v1.0.9] - 2026-03-06
 
 ### Fixed

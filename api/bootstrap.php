@@ -3344,7 +3344,7 @@ function mgk_build_windows_ssh_command($iisPorts, $servicePorts) {
         "if(\$cpu -eq \$null){try{\$counter=Get-Counter '\\Processor(_Total)\\% Processor Time' -MaxSamples 1 -ErrorAction Stop; \$samples=@(\$counter.CounterSamples); if(\$samples.Count -gt 0){\$cpu=[double]\$samples[\$samples.Count-1].CookedValue}}catch{}}",
         "\$cpuUtility=\$null",
         "try{\$utilityCounter=Get-Counter '\\Processor Information(_Total)\\% Processor Utility' -MaxSamples 1 -ErrorAction Stop; \$uSamples=@(\$utilityCounter.CounterSamples); if(\$uSamples.Count -gt 0){\$cpuUtility=[double]\$uSamples[\$uSamples.Count-1].CookedValue}}catch{}",
-        "if(\$cpuUtility -ne \$null){if(\$cpu -eq \$null -or (\$cpu -lt 8 -and \$cpuUtility -gt (\$cpu + 6))){\$cpu=\$cpuUtility}}",
+        "if(\$cpuUtility -ne \$null){if(\$cpu -eq \$null){\$cpu=\$cpuUtility} elseif(\$cpuUtility -gt \$cpu){\$cpu=\$cpuUtility}}",
         "if(\$cpu -eq \$null){try{\$cpuObj=Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average; if(\$cpuObj -and \$cpuObj.Average -ne \$null){\$cpu=[double]\$cpuObj.Average}}catch{}}",
         "if(\$cpu -eq \$null -or [double]::IsNaN([double]\$cpu) -or [double]::IsInfinity([double]\$cpu)){\$cpu=0}",
         "if(\$cpu -lt 0){\$cpu=0}",

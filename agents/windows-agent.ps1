@@ -53,7 +53,7 @@ while ($true) {
     }
 
     if ($null -ne $cpuUtility) {
-      if ($null -eq $cpu -or ($cpu -lt 8 -and $cpuUtility -gt ($cpu + 6))) {
+      if ($null -eq $cpu -or $cpuUtility -gt $cpu) {
         $cpu = $cpuUtility
       }
     }
