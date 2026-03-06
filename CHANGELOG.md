@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.11] - 2026-03-06
+
+### Fixed
+- Refined Windows CPU measurement source for localhost by reading `PercentProcessorUtility` from `Win32_PerfFormattedData_Counters_ProcessorInformation`.
+- Improved consistency against Windows Task Manager under high-load scenarios.
+
+### Changed
+- Unified CPU utility source update for both `pull_ssh` backend and Windows `push` agent.
+
 ## [v1.0.10] - 2026-03-06
 
 ### Fixed

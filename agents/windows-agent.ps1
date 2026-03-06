@@ -43,9 +43,11 @@ while ($true) {
 
     $cpuUtility = $null
     try {
-      $utilitySamples = (Get-Counter '\Processor Information(_Total)\% Processor Utility' -MaxSamples 1 -ErrorAction Stop).CounterSamples
-      if ($utilitySamples -and $utilitySamples.Count -gt 0) {
-        $cpuUtility = [double]$utilitySamples[$utilitySamples.Count - 1].CookedValue
+      $perfUtil = Get-CimInstance Win32_PerfFormattedData_Counters_ProcessorInformation -ErrorAction Stop |
+        Where-Object { $_.Name -eq '_Total' } |
+        Select-Object -First 1
+      if ($perfUtil -and $null -ne $perfUtil.PercentProcessorUtility) {
+        $cpuUtility = [double]$perfUtil.PercentProcessorUtility
       }
     }
     catch {
