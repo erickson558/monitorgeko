@@ -41,6 +41,23 @@ while ($true) {
       }
     }
 
+    $cpuUtility = $null
+    try {
+      $utilitySamples = (Get-Counter '\Processor Information(_Total)\% Processor Utility' -SampleInterval 1 -MaxSamples 2 -ErrorAction Stop).CounterSamples
+      if ($utilitySamples -and $utilitySamples.Count -gt 0) {
+        $cpuUtility = [double]$utilitySamples[$utilitySamples.Count - 1].CookedValue
+      }
+    }
+    catch {
+      $cpuUtility = $null
+    }
+
+    if ($null -ne $cpuUtility) {
+      if ($null -eq $cpu -or ($cpu -lt 8 -and $cpuUtility -gt ($cpu + 6))) {
+        $cpu = $cpuUtility
+      }
+    }
+
     if ($null -eq $cpu) {
       try {
         $cpuLoad = Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average

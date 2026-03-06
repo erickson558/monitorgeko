@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.8] - 2026-03-06
+
+### Fixed
+- Improved CPU accuracy for Windows localhost scenarios where CPU stayed near `0%` despite active load.
+- Added `Processor Utility` sampling fallback and anti-underreporting logic for both `pull_ssh` and Windows `push` agent.
+
+### Changed
+- CPU source selection now prefers the most representative sampled value when `Processor Time` reports unrealistically low usage.
+
 ## [v1.0.7] - 2026-03-06
 
 ### Changed
