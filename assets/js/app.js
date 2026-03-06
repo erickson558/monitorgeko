@@ -1655,13 +1655,13 @@
 
   function applyMetricMotionCadence(pollMs) {
     var safePollMs = normalizeUiPollMs(pollMs, defaultUiPollMs);
-    // Keep bar motion visually aligned with chart refresh rhythm.
-    var transitionMs = Math.round(safePollMs * 0.55);
-    if (transitionMs < 40) {
-      transitionMs = 40;
+    // Keep bars highly reactive and close to chart update feel.
+    var transitionMs = Math.round(safePollMs * 0.12);
+    if (transitionMs < 12) {
+      transitionMs = 12;
     }
-    if (transitionMs > 220) {
-      transitionMs = 220;
+    if (transitionMs > 70) {
+      transitionMs = 70;
     }
     document.documentElement.style.setProperty('--metric-fill-transition-ms', transitionMs + 'ms');
   }

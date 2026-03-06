@@ -29,7 +29,7 @@
   --task-canvas-height: 138px;
   --task-legend-height: 72px;
   --controls-panel-width: 390px;
-  --metric-fill-transition-ms: 120ms;
+  --metric-fill-transition-ms: 28ms;
 }
 
 body[data-theme='glass'] {

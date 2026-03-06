@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.7] - 2026-03-06
+
+### Changed
+- Tuned card metric bar transitions (CPU/RAM/DISK/RED) to near-instant updates.
+- Reduced dynamic transition window to `12ms..70ms` and lowered default transition baseline.
+
+### Fixed
+- Improved perceived lag between card bars and lower task-style charts.
+
 ## [v1.0.6] - 2026-03-06
 
 ### Changed
