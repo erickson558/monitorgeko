@@ -428,6 +428,7 @@ for ($i = 0; $i < count($devices); $i++) {
 }
 
 mgk_ok(array(
+    'app_version' => mgk_get_app_version(),
     'generated_at' => mgk_now_iso(),
     'settings' => $settings,
     'summary' => $summary,

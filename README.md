@@ -1,34 +1,38 @@
 # MonitorGEKO
 
-Dashboard web para monitorear equipos en tiempo real (CPU, RAM, DISK), con umbrales por color, gestion individual, y operaciones masivas.
+MonitorGEKO es un dashboard web para monitoreo de equipos en tiempo real con enfoque operativo:
 
-## Funciones
+- Estado de salud por equipo (`green`, `yellow`, `red`)
+- Metricas: CPU, RAM, DISK y RED
+- Gestion de equipos individual y masiva
+- Captura por `push`, `pull_http` y `pull_ssh`
+- Historial por hora y eventos de estado/servicios
 
-- Monitoreo en vivo por tarjetas con estado `verde`, `amarillo`, `rojo`.
-- Umbrales configurables por equipo para CPU/RAM/DISK.
-- Alta, edicion y eliminacion de equipos.
-- Alta masiva por texto CSV.
-- Eliminacion masiva por seleccion.
-- Soporte de credenciales por equipo para modo `pull_http`.
-- Soporte de monitoreo por `pull_ssh` (puerto 22) para Linux y Windows.
-- Modo `push` con token por equipo para ingesta segura.
+## Que Hace El Programa
 
-## Estructura
+1. Registra equipos y su forma de consulta.
+2. Obtiene metricas periodicamente o recibe ingesta desde agentes.
+3. Evalua umbrales por equipo.
+4. Calcula estado consolidado y muestra tarjetas en vivo.
+5. Guarda metricas, eventos e historico en archivos JSON locales.
 
-- `index.php`: UI del dashboard.
-- `api/devices.php`: CRUD + masivos.
-- `api/state.php`: estado consolidado para la UI.
-- `api/ingest.php`: endpoint para que agentes envien metricas.
-- `assets/css/app.css`: estilos.
-- `assets/js/app.js`: logica frontend.
-- `agents/windows-agent.ps1`: agente de ejemplo para Windows.
-- `agents/linux-agent.sh`: agente de ejemplo para Linux.
+## Arquitectura
 
-## Flujo recomendado (push)
+- `index.php`: frontend y configuracion inicial.
+- `assets/js/app.js`: logica de UI, render, polling y acciones.
+- `api/state.php`: estado consolidado para dashboard.
+- `api/devices.php`: CRUD de equipos y operaciones masivas.
+- `api/ingest.php`: ingesta `push` de agentes.
+- `api/bootstrap.php`: utilidades compartidas, normalizacion, SSH y seguridad.
+- `agents/windows-agent.ps1`: agente `push` para Windows.
+- `agents/linux-agent.sh`: agente `push` para Linux.
+- `data/*.json`: almacenamiento local.
 
-1. En la UI agrega un equipo en modo `push`.
-2. Copia el `token` del equipo.
-3. Ejecuta el agente en el equipo remoto:
+## Modos De Monitoreo
+
+## `push` (recomendado)
+
+El agente remoto envia metricas al endpoint `api/ingest.php` con `device_id` y `token`.
 
 ### Windows
 
@@ -50,49 +54,72 @@ bash ./agents/linux-agent.sh \
   5
 ```
 
-## Modo alterno (pull_http)
+## `pull_http`
 
-- Configura un equipo en modo `pull_http` con una URL que responda JSON.
-- Puedes definir `usuario/password` por equipo para Basic Auth.
-- JSON esperado:
+Consulta un endpoint HTTP remoto que responde JSON con metricas.
 
 ```json
 {
   "metrics": {
     "cpu": 22.4,
     "ram": 64.1,
-    "disk": 71.0
+    "disk": 71.0,
+    "network": 18.7
   }
 }
 ```
 
-## Modo SSH (pull_ssh, puerto 22)
+## `pull_ssh`
 
-- Configura el equipo en modo `pull_ssh`.
-- Define `usuario`, `password` o `llave privada` (`ssh_key_path`) en el servidor.
-- Configura `ssh_os`:
-  - `linux` para equipos Linux.
-  - `windows` para equipos Windows con OpenSSH habilitado.
-  - `auto` intenta Linux y luego Windows.
+El servidor MonitorGEKO entra por SSH y ejecuta comandos remotos en Linux o Windows.
 
-### Requisitos
+- `ssh_os=linux`: comandos Linux
+- `ssh_os=windows`: PowerShell remoto
+- `ssh_os=auto`: intenta Linux y luego Windows
 
-- Puerto `22` accesible desde el servidor MonitorGEKO hacia los equipos.
-- En Windows: servicio `OpenSSH Server (sshd)` activo.
-- Si usaras `ssh` CLI sin `ssh2/plink`, recomienda llave privada en `ssh_key_path`.
+## Metricas De Red
 
-### Comandos remotos usados
+La metrica `network` se maneja como porcentaje normalizado `0-100`, usando Mbps instantaneos capados a 100 para visualizacion homogena.
 
-- Linux: `top`, `free`, `df` para CPU/RAM/DISK.
-- Windows: `powershell` con `Get-Counter` y `Get-CimInstance` para CPU/RAM/DISK.
+- Linux: delta de bytes (`/proc/net/dev`) convertido a Mbps con precision decimal.
+- Windows: `Get-Counter` sobre interfaces y fallback por muestreo de `Get-NetAdapterStatistics`.
+- Agentes `push` Linux/Windows ya incluyen `network`.
+
+Si la red aparece baja en pruebas:
+
+1. Verifica que el intervalo del agente coincida con la duracion de la prueba.
+2. Asegura que no solo se mida interfaz loopback.
+3. Revisa que el trafico salga por interfaz fisica activa.
+
+## Dependencias
+
+Consulta `DEPENDENCIES.md` para detalle completo de runtime y herramientas.
 
 ## Seguridad
 
-- Password por equipo se guarda cifrada (`AES-256-CBC`) en `data/devices.json`.
-- Puedes definir variable de entorno `MONITORGEKO_SECRET` para controlar la llave de cifrado.
-- Si no se define, el sistema genera una llave local en `data/.secret`.
-- Si `OpenSSL` no esta disponible en PHP, se usa un fallback de compatibilidad para almacenar password de forma ofuscada.
+- Credenciales de equipos cifradas en reposo (`AES-256-CBC`) cuando OpenSSL esta disponible.
+- Clave por variable `MONITORGEKO_SECRET` o archivo local `data/.secret`.
+- Token por equipo para ingesta `push`.
+- Recomendado: restringir acceso web a `data/` y respaldar periodicamente.
 
-## Nota
+## Versionado Y Releases
 
-Para proteger archivos internos se incluye `data/.htaccess`.
+El proyecto usa SemVer con prefijo `Vx.x.x` en formato almacenado `vX.Y.Z`.
+
+- Fuente unica de verdad: archivo `VERSION`.
+- La app muestra la version en UI y `api/state.php` (`app_version`).
+- Cada commit de release debe incrementar version.
+- Cada release debe crear tag git igual a `VERSION`.
+
+Flujo recomendado:
+
+1. Actualizar `VERSION`.
+2. Actualizar `CHANGELOG.md`.
+3. Commit con mensaje de release.
+4. Crear tag (`git tag vX.Y.Z`).
+5. Push branch y tag (`git push origin main` y `git push origin vX.Y.Z`).
+
+## Licencia
+
+Este proyecto se distribuye bajo `Apache License 2.0`.
+Consulta el archivo `LICENSE`.

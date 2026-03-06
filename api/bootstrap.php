@@ -13,6 +13,36 @@ define('MONITORGEKO_EVENTS_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'even
 define('MONITORGEKO_HISTORY_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'history.json');
 define('MONITORGEKO_SETTINGS_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'settings.json');
 define('MONITORGEKO_SECRET_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . '.secret');
+define('MONITORGEKO_VERSION_FILE', MONITORGEKO_ROOT . DIRECTORY_SEPARATOR . 'VERSION');
+
+function mgk_get_app_version() {
+    static $cachedVersion = null;
+
+    if ($cachedVersion !== null) {
+        return $cachedVersion;
+    }
+
+    $defaultVersion = 'v0.1.0';
+    if (!file_exists(MONITORGEKO_VERSION_FILE)) {
+        $cachedVersion = $defaultVersion;
+        return $cachedVersion;
+    }
+
+    $content = @file_get_contents(MONITORGEKO_VERSION_FILE);
+    if ($content === false) {
+        $cachedVersion = $defaultVersion;
+        return $cachedVersion;
+    }
+
+    $version = trim((string) $content);
+    if (!preg_match('/^v[0-9]+\.[0-9]+\.[0-9]+$/', $version)) {
+        $cachedVersion = $defaultVersion;
+        return $cachedVersion;
+    }
+
+    $cachedVersion = $version;
+    return $cachedVersion;
+}
 
 function mgk_init_storage() {
     if (!is_dir(MONITORGEKO_DATA)) {
@@ -3243,7 +3273,7 @@ function mgk_build_linux_ssh_command($javaPorts, $servicePorts) {
     $javaPorts = mgk_parse_port_list($javaPorts, array());
     $servicePorts = mgk_parse_port_list($servicePorts, array());
 
-    $command = "LC_ALL=C net_b1=\$(cat /proc/net/dev 2>/dev/null | awk -F'[: ]+' '/:/{if(\$1 !~ /lo/){rx+=\$3; tx+=\$11}} END {print rx+tx+0}'); idle=\$(vmstat 1 2 2>/dev/null | tail -1 | tr -s \\  | xargs | cut -d\\  -f15); if [ x\$idle = x ]; then idle=0; fi; cpu=\$((100-idle)); mem_line=\$(free -k 2>/dev/null | grep Mem: | tr -s \\  | xargs); mem_total=\$(echo \$mem_line | cut -d\\  -f2); mem_used=\$(echo \$mem_line | cut -d\\  -f3); if [ x\$mem_total = x ] || [ \$mem_total -lt 1 ] 2>/dev/null; then mem_total=0; fi; if [ x\$mem_used = x ] || [ \$mem_used -lt 0 ] 2>/dev/null; then mem_used=0; fi; if [ \$mem_total -gt 0 ] 2>/dev/null; then ram=\$((100*mem_used/mem_total)); else ram=0; fi; ram_total_bytes=\$((mem_total*1024)); ram_used_bytes=\$((mem_used*1024)); disk_line=\$(df -Pk / 2>/dev/null | tail -1 | tr -s \\  | xargs); disk_total=\$(echo \$disk_line | cut -d\\  -f2); disk_used=\$(echo \$disk_line | cut -d\\  -f3); disk_pct=\$(echo \$disk_line | cut -d\\  -f5 | tr -d %); if [ x\$disk_total = x ] || [ \$disk_total -lt 1 ] 2>/dev/null; then disk_total=0; fi; if [ x\$disk_used = x ] || [ \$disk_used -lt 0 ] 2>/dev/null; then disk_used=0; fi; if [ x\$disk_pct = x ] || [ \$disk_pct -lt 0 ] 2>/dev/null; then if [ \$disk_total -gt 0 ] 2>/dev/null; then disk_pct=\$((100*disk_used/disk_total)); else disk_pct=0; fi; fi; disk_total_bytes=\$((disk_total*1024)); disk_used_bytes=\$((disk_used*1024)); net_b2=\$(cat /proc/net/dev 2>/dev/null | awk -F'[: ]+' '/:/{if(\$1 !~ /lo/){rx+=\$3; tx+=\$11}} END {print rx+tx+0}'); net_delta=\$((net_b2-net_b1)); if [ x\$net_delta = x ] || [ \$net_delta -lt 0 ] 2>/dev/null; then net_delta=0; fi; net=\$((net_delta*8/1000000)); if [ \$net -lt 0 ] 2>/dev/null; then net=0; fi; if [ \$net -gt 100 ] 2>/dev/null; then net=100; fi; cpu=\${cpu:-0}; ram=\${ram:-0}; disk_pct=\${disk_pct:-0}; net=\${net:-0}; ram_total_bytes=\${ram_total_bytes:-0}; ram_used_bytes=\${ram_used_bytes:-0}; disk_total_bytes=\${disk_total_bytes:-0}; disk_used_bytes=\${disk_used_bytes:-0}; echo cpu=\$cpu; echo ram=\$ram; echo disk=\$disk_pct; echo network=\$net; echo ram_used_bytes=\$ram_used_bytes; echo ram_total_bytes=\$ram_total_bytes; echo disk_used_bytes=\$disk_used_bytes; echo disk_total_bytes=\$disk_total_bytes";
+    $command = "LC_ALL=C net_b1=\$(cat /proc/net/dev 2>/dev/null | awk -F'[: ]+' '/:/{if(\$1 !~ /lo/){rx+=\$3; tx+=\$11}} END {print rx+tx+0}'); idle=\$(vmstat 1 2 2>/dev/null | tail -1 | tr -s \\  | xargs | cut -d\\  -f15); if [ x\$idle = x ]; then idle=0; fi; cpu=\$((100-idle)); mem_line=\$(free -k 2>/dev/null | grep Mem: | tr -s \\  | xargs); mem_total=\$(echo \$mem_line | cut -d\\  -f2); mem_used=\$(echo \$mem_line | cut -d\\  -f3); if [ x\$mem_total = x ] || [ \$mem_total -lt 1 ] 2>/dev/null; then mem_total=0; fi; if [ x\$mem_used = x ] || [ \$mem_used -lt 0 ] 2>/dev/null; then mem_used=0; fi; if [ \$mem_total -gt 0 ] 2>/dev/null; then ram=\$((100*mem_used/mem_total)); else ram=0; fi; ram_total_bytes=\$((mem_total*1024)); ram_used_bytes=\$((mem_used*1024)); disk_line=\$(df -Pk / 2>/dev/null | tail -1 | tr -s \\  | xargs); disk_total=\$(echo \$disk_line | cut -d\\  -f2); disk_used=\$(echo \$disk_line | cut -d\\  -f3); disk_pct=\$(echo \$disk_line | cut -d\\  -f5 | tr -d %); if [ x\$disk_total = x ] || [ \$disk_total -lt 1 ] 2>/dev/null; then disk_total=0; fi; if [ x\$disk_used = x ] || [ \$disk_used -lt 0 ] 2>/dev/null; then disk_used=0; fi; if [ x\$disk_pct = x ] || [ \$disk_pct -lt 0 ] 2>/dev/null; then if [ \$disk_total -gt 0 ] 2>/dev/null; then disk_pct=\$((100*disk_used/disk_total)); else disk_pct=0; fi; fi; disk_total_bytes=\$((disk_total*1024)); disk_used_bytes=\$((disk_used*1024)); net_b2=\$(cat /proc/net/dev 2>/dev/null | awk -F'[: ]+' '/:/{if(\$1 !~ /lo/){rx+=\$3; tx+=\$11}} END {print rx+tx+0}'); net_delta=\$((net_b2-net_b1)); if [ x\$net_delta = x ] || [ \$net_delta -lt 0 ] 2>/dev/null; then net_delta=0; fi; net=\$(awk -v bytes=\$net_delta 'BEGIN{v=(bytes*8)/1000000; if(v<0){v=0}; if(v>100){v=100}; printf \"%.2f\", v}'); cpu=\${cpu:-0}; ram=\${ram:-0}; disk_pct=\${disk_pct:-0}; net=\${net:-0}; ram_total_bytes=\${ram_total_bytes:-0}; ram_used_bytes=\${ram_used_bytes:-0}; disk_total_bytes=\${disk_total_bytes:-0}; disk_used_bytes=\${disk_used_bytes:-0}; echo cpu=\$cpu; echo ram=\$ram; echo disk=\$disk_pct; echo network=\$net; echo ram_used_bytes=\$ram_used_bytes; echo ram_total_bytes=\$ram_total_bytes; echo disk_used_bytes=\$disk_used_bytes; echo disk_total_bytes=\$disk_total_bytes";
     $listenProbeBody = "if ss -ltn 2>/dev/null | grep -E :\$p[^0-9] >/dev/null 2>&1; then %RESULT%=1; elif netstat -ltn 2>/dev/null | grep -E :\$p[^0-9] >/dev/null 2>&1; then %RESULT%=1; elif lsof -iTCP -sTCP:LISTEN -n -P 2>/dev/null | grep -E :\$p[^0-9] >/dev/null 2>&1; then %RESULT%=1; fi";
 
     if (count($javaPorts) > 0) {
@@ -3309,7 +3339,11 @@ function mgk_build_windows_ssh_command($iisPorts, $servicePorts) {
     }
 
     $psCommands = array(
-        "\$cpu=(Get-Counter '\\Processor(_Total)\\% Processor Time').CounterSamples[0].CookedValue",
+        "\$cpu=\$null",
+        "try{\$cpuSample=Get-Counter '\\Processor(_Total)\\% Processor Time' -ErrorAction Stop;\$cpu=\$cpuSample.CounterSamples[0].CookedValue}catch{}",
+        "if(\$cpu -eq \$null -or [double]::IsNaN([double]\$cpu) -or [double]::IsInfinity([double]\$cpu)){\$cpu=\$null}",
+        "if(\$cpu -eq \$null){try{\$cpuObj=Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average; if(\$cpuObj -and \$cpuObj.Average -ne \$null){\$cpu=[double]\$cpuObj.Average}}catch{}}",
+        "if(\$cpu -eq \$null){\$cpu=0}",
         "\$os=Get-CimInstance Win32_OperatingSystem",
         "\$ram=0",
         "\$ramTotalBytes=0",
@@ -3320,11 +3354,10 @@ function mgk_build_windows_ssh_command($iisPorts, $servicePorts) {
         "\$diskTotalBytes=0",
         "\$diskUsedBytes=0",
         "if(\$diskObj -and \$diskObj.Size -gt 0){\$diskTotalBytes=[double]\$diskObj.Size;\$diskUsedBytes=[double](\$diskObj.Size-\$diskObj.FreeSpace);\$disk=((\$diskObj.Size-\$diskObj.FreeSpace)/\$diskObj.Size)*100}",
-        "\$netSamples=(Get-Counter '\\Network Interface(*)\\Bytes Total/sec' -ErrorAction SilentlyContinue).CounterSamples",
-        "\$netBytes=0",
-        "if(\$netSamples){foreach(\$s in \$netSamples){if(\$s.InstanceName -notmatch 'Loopback'){\$netBytes+=[double]\$s.CookedValue}}}",
-        "\$network=0",
-        "if(\$netBytes -gt 0){\$network=(\$netBytes*8)/1000000}",
+        "\$network=\$null",
+        "try{\$netSamples=(Get-Counter '\\Network Interface(*)\\Bytes Total/sec' -ErrorAction Stop).CounterSamples; if(\$netSamples){\$netBytes=0; foreach(\$s in \$netSamples){if(\$s.InstanceName -notmatch 'Loopback|isatap|Teredo'){\$netBytes+=[double]\$s.CookedValue}}; if(\$netBytes -gt 0){\$network=(\$netBytes*8)/1000000}}}catch{}",
+        "if(\$network -eq \$null){try{\$a1=Get-NetAdapterStatistics -ErrorAction Stop | Where-Object {\$_.Name -notmatch 'Loopback|isatap|Teredo'}; Start-Sleep -Milliseconds 900; \$a2=Get-NetAdapterStatistics -ErrorAction Stop | Where-Object {\$_.Name -notmatch 'Loopback|isatap|Teredo'}; \$b1=0; \$b2=0; foreach(\$it in \$a1){\$b1+=[double]\$it.ReceivedBytes+[double]\$it.SentBytes}; foreach(\$it in \$a2){\$b2+=[double]\$it.ReceivedBytes+[double]\$it.SentBytes}; if(\$b2 -ge \$b1){\$network=((\$b2-\$b1)*8)/1000000}}catch{}}",
+        "if(\$network -eq \$null){\$network=0}",
         "if(\$network -lt 0){\$network=0}",
         "if(\$network -gt 100){\$network=100}",
         "\$iis=0",

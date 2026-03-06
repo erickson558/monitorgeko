@@ -4,6 +4,7 @@ mgk_init_storage();
 $settings = mgk_get_settings();
 $defaultPollMs = 500;
 $defaultTheme = isset($settings['theme_default']) ? mgk_normalize_theme($settings['theme_default']) : 'dark';
+$appVersion = mgk_get_app_version();
 $cssVersion = @filemtime(__DIR__ . '/assets/css/app.css');
 $jsVersion = @filemtime(__DIR__ . '/assets/js/app.js');
 if (!$cssVersion) {
@@ -17,7 +18,7 @@ if (!$jsVersion) {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>MonitorGEKO | Monitoreo en tiempo real</title>
+  <title>MonitorGEKO <?php echo htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8'); ?> | Monitoreo en tiempo real</title>
   <link rel="stylesheet" href="assets/css/app.css?v=<?php echo urlencode((string) $cssVersion); ?>"/>
 </head>
 <body>
@@ -29,6 +30,7 @@ if (!$jsVersion) {
       <div>
         <p class="eyebrow">NOC Dashboard</p>
         <h1>MonitorGEKO</h1>
+        <p class="hint">Version <?php echo htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8'); ?></p>
         <p class="hero-copy">Monitorea CPU, RAM, Disco y Red en tiempo real. Administra equipos de forma individual y masiva con umbrales por color.</p>
       </div>
       <div class="hero-actions">
@@ -332,7 +334,8 @@ if (!$jsVersion) {
         ops: 'api/ops.php'
       },
       pollIntervalMs: <?php echo json_encode($defaultPollMs); ?>,
-      themeDefault: <?php echo json_encode($defaultTheme); ?>
+      themeDefault: <?php echo json_encode($defaultTheme); ?>,
+      appVersion: <?php echo json_encode($appVersion); ?>
     };
   </script>
   <script src="assets/js/app.js?v=<?php echo urlencode((string) $jsVersion); ?>" defer></script>

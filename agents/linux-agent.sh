@@ -29,18 +29,29 @@ get_disk() {
   df -P / | awk 'NR==2 { gsub(/%/,"",$5); print $5 }'
 }
 
+get_net_bytes_total() {
+  awk -F'[: ]+' '/:/{ if ($1 !~ /lo/) { rx += $3; tx += $11 } } END { print rx + tx + 0 }' /proc/net/dev 2>/dev/null
+}
+
 echo "MonitorGEKO Linux agent iniciado para DEVICE_ID=${DEVICE_ID}"
 
 while true; do
+  net_b1="$(get_net_bytes_total)"
   cpu="$(get_cpu)"
   ram="$(get_ram)"
   disk="$(get_disk)"
+  net_b2="$(get_net_bytes_total)"
+  net_delta=$((net_b2-net_b1))
+  if [[ -z "${net_delta}" || "${net_delta}" -lt 0 ]]; then
+    net_delta=0
+  fi
+  network="$(awk -v bytes="$net_delta" 'BEGIN { v=(bytes*8)/1000000; if (v<0) v=0; if (v>100) v=100; printf "%.2f", v }')"
   host="$(hostname)"
 
-  payload=$(printf '{"device_id":"%s","token":"%s","host":"%s","metrics":{"cpu":%s,"ram":%s,"disk":%s}}' "$DEVICE_ID" "$TOKEN" "$host" "$cpu" "$ram" "$disk")
+  payload=$(printf '{"device_id":"%s","token":"%s","host":"%s","metrics":{"cpu":%s,"ram":%s,"disk":%s,"network":%s}}' "$DEVICE_ID" "$TOKEN" "$host" "$cpu" "$ram" "$disk" "$network")
 
   if curl -sS -X POST "$ENDPOINT" -H 'Content-Type: application/json' -d "$payload" >/dev/null; then
-    echo "[$(date +%H:%M:%S)] OK CPU=${cpu}% RAM=${ram}% DISK=${disk}%"
+    echo "[$(date +%H:%M:%S)] OK CPU=${cpu}% RAM=${ram}% DISK=${disk}% RED=${network}%"
   else
     echo "[$(date +%H:%M:%S)] Error enviando metricas" >&2
   fi
