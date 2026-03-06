@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.9] - 2026-03-06
+
+### Fixed
+- Improved CPU fluidity for `localhost` by prioritizing local pull candidates in `api/state.php` scheduler.
+- Reduced Windows CPU sampling latency by removing 1-second counter sampling windows in both `pull_ssh` and Windows `push` agent.
+
+### Changed
+- Localhost devices now get higher pull priority, improving near-real-time updates on card metrics.
+
 ## [v1.0.8] - 2026-03-06
 
 ### Fixed

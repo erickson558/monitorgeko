@@ -68,6 +68,9 @@ if ($pullEnabled) {
             continue;
         }
 
+        $hostText = isset($device['host']) ? strtolower(trim((string) $device['host'])) : '';
+        $isLocalHost = $hostText === 'localhost' || $hostText === '127.0.0.1' || $hostText === '::1';
+
         $currentPacket = isset($metricsStore[$deviceId]) && is_array($metricsStore[$deviceId])
             ? $metricsStore[$deviceId]
             : array();
@@ -96,6 +99,7 @@ if ($pullEnabled) {
             'device' => $device,
             'device_id' => $deviceId,
             'mode' => $mode,
+            'priority_score' => $isLocalHost ? 1 : 0,
             'age_score' => ($age === null) ? 1000000000 : (int) $age,
             'poll_seconds' => $devicePollSeconds
         );
@@ -103,6 +107,11 @@ if ($pullEnabled) {
 
     if (count($pullCandidates) > 1) {
         usort($pullCandidates, function ($a, $b) {
+            $aPriority = isset($a['priority_score']) ? (int) $a['priority_score'] : 0;
+            $bPriority = isset($b['priority_score']) ? (int) $b['priority_score'] : 0;
+            if ($aPriority !== $bPriority) {
+                return ($aPriority > $bPriority) ? -1 : 1;
+            }
             if ($a['age_score'] === $b['age_score']) {
                 return strcmp($a['device_id'], $b['device_id']);
             }

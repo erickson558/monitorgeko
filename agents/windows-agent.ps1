@@ -31,7 +31,7 @@ while ($true) {
 
     if ($null -eq $cpu) {
       try {
-        $samples = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 2 -ErrorAction Stop).CounterSamples
+        $samples = (Get-Counter '\Processor(_Total)\% Processor Time' -MaxSamples 1 -ErrorAction Stop).CounterSamples
         if ($samples -and $samples.Count -gt 0) {
           $cpu = [double]$samples[$samples.Count - 1].CookedValue
         }
@@ -43,7 +43,7 @@ while ($true) {
 
     $cpuUtility = $null
     try {
-      $utilitySamples = (Get-Counter '\Processor Information(_Total)\% Processor Utility' -SampleInterval 1 -MaxSamples 2 -ErrorAction Stop).CounterSamples
+      $utilitySamples = (Get-Counter '\Processor Information(_Total)\% Processor Utility' -MaxSamples 1 -ErrorAction Stop).CounterSamples
       if ($utilitySamples -and $utilitySamples.Count -gt 0) {
         $cpuUtility = [double]$utilitySamples[$utilitySamples.Count - 1].CookedValue
       }
