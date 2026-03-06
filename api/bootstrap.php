@@ -3340,10 +3340,12 @@ function mgk_build_windows_ssh_command($iisPorts, $servicePorts) {
 
     $psCommands = array(
         "\$cpu=\$null",
-        "try{\$cpuSample=Get-Counter '\\Processor(_Total)\\% Processor Time' -ErrorAction Stop;\$cpu=\$cpuSample.CounterSamples[0].CookedValue}catch{}",
-        "if(\$cpu -eq \$null -or [double]::IsNaN([double]\$cpu) -or [double]::IsInfinity([double]\$cpu)){\$cpu=\$null}",
+        "try{\$perfCpu=Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -ErrorAction Stop | Where-Object {\$_.Name -eq '_Total'} | Select-Object -First 1; if(\$perfCpu -and \$perfCpu.PercentProcessorTime -ne \$null){\$cpu=[double]\$perfCpu.PercentProcessorTime}}catch{}",
+        "if(\$cpu -eq \$null){try{\$counter=Get-Counter '\\Processor(_Total)\\% Processor Time' -SampleInterval 1 -MaxSamples 2 -ErrorAction Stop; \$samples=@(\$counter.CounterSamples); if(\$samples.Count -gt 0){\$cpu=[double]\$samples[\$samples.Count-1].CookedValue}}catch{}}",
         "if(\$cpu -eq \$null){try{\$cpuObj=Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average; if(\$cpuObj -and \$cpuObj.Average -ne \$null){\$cpu=[double]\$cpuObj.Average}}catch{}}",
-        "if(\$cpu -eq \$null){\$cpu=0}",
+        "if(\$cpu -eq \$null -or [double]::IsNaN([double]\$cpu) -or [double]::IsInfinity([double]\$cpu)){\$cpu=0}",
+        "if(\$cpu -lt 0){\$cpu=0}",
+        "if(\$cpu -gt 100){\$cpu=100}",
         "\$os=Get-CimInstance Win32_OperatingSystem",
         "\$ram=0",
         "\$ramTotalBytes=0",

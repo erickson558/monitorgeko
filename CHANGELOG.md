@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.4] - 2026-03-06
+
+### Fixed
+- Refined Windows CPU measurement for `pull_ssh` to better match real-time load.
+- CPU collection now prioritizes `Win32_PerfFormattedData_PerfOS_Processor(_Total)`, then sampled `Get-Counter`, and finally `Win32_Processor.LoadPercentage` fallback.
+- Added numeric guardrails (`0-100`) to avoid invalid CPU outputs.
+
+### Changed
+- Aligned `agents/windows-agent.ps1` with the same improved CPU strategy for consistency across `push` and `pull_ssh` flows.
+
 ## [v1.0.3] - 2026-03-06
 
 ### Added

@@ -18,13 +18,30 @@ while ($true) {
   try {
     $cpu = $null
     try {
-      $cpu = (Get-Counter '\Processor(_Total)\% Processor Time' -ErrorAction Stop).CounterSamples[0].CookedValue
+      $perfCpu = Get-CimInstance Win32_PerfFormattedData_PerfOS_Processor -ErrorAction Stop |
+        Where-Object { $_.Name -eq '_Total' } |
+        Select-Object -First 1
+      if ($perfCpu -and $null -ne $perfCpu.PercentProcessorTime) {
+        $cpu = [double]$perfCpu.PercentProcessorTime
+      }
     }
     catch {
       $cpu = $null
     }
 
-    if ($null -eq $cpu -or [double]::IsNaN([double]$cpu) -or [double]::IsInfinity([double]$cpu)) {
+    if ($null -eq $cpu) {
+      try {
+        $samples = (Get-Counter '\Processor(_Total)\% Processor Time' -SampleInterval 1 -MaxSamples 2 -ErrorAction Stop).CounterSamples
+        if ($samples -and $samples.Count -gt 0) {
+          $cpu = [double]$samples[$samples.Count - 1].CookedValue
+        }
+      }
+      catch {
+        $cpu = $null
+      }
+    }
+
+    if ($null -eq $cpu) {
       try {
         $cpuLoad = Get-CimInstance Win32_Processor -ErrorAction Stop | Measure-Object -Property LoadPercentage -Average
         if ($cpuLoad -and $null -ne $cpuLoad.Average) {
@@ -36,8 +53,14 @@ while ($true) {
       }
     }
 
-    if ($null -eq $cpu) {
+    if ($null -eq $cpu -or [double]::IsNaN([double]$cpu) -or [double]::IsInfinity([double]$cpu)) {
       $cpu = 0
+    }
+    if ($cpu -lt 0) {
+      $cpu = 0
+    }
+    if ($cpu -gt 100) {
+      $cpu = 100
     }
 
     $os = Get-CimInstance Win32_OperatingSystem
