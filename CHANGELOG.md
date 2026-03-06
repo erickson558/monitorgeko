@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.3] - 2026-03-06
+
+### Added
+- GitHub Actions workflow `.github/workflows/release-on-main.yml` to create a release on every push to `main`.
+- Automatic validation of `VERSION` format (`vX.Y.Z`) in CI before tagging/releasing.
+
+### Changed
+- Release process now reads version directly from `VERSION`, creates tag if missing, and publishes GitHub Release with changelog notes.
+
 ## [v1.0.2] - 2026-03-06
 
 ### Fixed
