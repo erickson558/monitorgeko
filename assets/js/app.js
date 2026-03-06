@@ -1641,6 +1641,7 @@
 
   function applyUiPollInterval(ms) {
     state.uiPollMs = normalizeUiPollMs(ms, state.uiPollMs);
+    applyMetricMotionCadence(state.uiPollMs);
     if (state.uiTimer !== null) {
       window.clearInterval(state.uiTimer);
       state.uiTimer = null;
@@ -1650,6 +1651,19 @@
       loadState(false, false, { requestPull: false, background: true, quiet: true, maxPull: 1 });
     }, state.uiPollMs);
     updatePollInfo();
+  }
+
+  function applyMetricMotionCadence(pollMs) {
+    var safePollMs = normalizeUiPollMs(pollMs, defaultUiPollMs);
+    // Keep bar motion visually aligned with chart refresh rhythm.
+    var transitionMs = Math.round(safePollMs * 0.55);
+    if (transitionMs < 40) {
+      transitionMs = 40;
+    }
+    if (transitionMs > 220) {
+      transitionMs = 220;
+    }
+    document.documentElement.style.setProperty('--metric-fill-transition-ms', transitionMs + 'ms');
   }
 
   function updatePollInfo() {

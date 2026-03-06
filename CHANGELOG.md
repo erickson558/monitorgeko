@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.6] - 2026-03-06
+
+### Changed
+- Synchronized metric bar animation cadence with dashboard polling speed.
+- Bar transition time is now dynamic and derived from `uiPollMs`, reducing the lag versus task-style charts.
+
+### Fixed
+- Improved perceived real-time behavior for card bars under fast refresh intervals.
+
 ## [v1.0.5] - 2026-03-06
 
 ### Changed
