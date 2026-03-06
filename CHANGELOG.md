@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.2] - 2026-03-06
+
+### Fixed
+- Resolved `pull_ssh` failures on Windows with `plink` reporting `The command line is too long`.
+- Updated SSH Windows command builder to prefer the shortest PowerShell transport (`-Command` vs `-EncodedCommand`) to stay under line-length limits.
+
+### Changed
+- Release version updated to `v1.0.2` and propagated through app/runtime version source (`VERSION`).
+
 ## [v1.0.1] - 2026-03-06
 
 ### Added

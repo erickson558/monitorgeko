@@ -3373,13 +3373,23 @@ function mgk_build_windows_ssh_command($iisPorts, $servicePorts) {
     );
 
     $script = implode(';', $psCommands);
+
+    // Prefer the shorter transport command to avoid plink/cmd line-length limits.
+    $escapedScript = str_replace('"', '\\"', $script);
+    $plainCommand = 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "' . $escapedScript . '"';
+
     $encoded = mgk_utf16le_base64($script);
-    if ($encoded !== '') {
-        return 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ' . $encoded;
+    if ($encoded === '') {
+        return $plainCommand;
     }
 
-    $escapedScript = str_replace('"', '\"', $script);
-    return 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command "' . $escapedScript . '"';
+    $encodedCommand = 'powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ' . $encoded;
+
+    if (strlen($plainCommand) <= strlen($encodedCommand)) {
+        return $plainCommand;
+    }
+
+    return $encodedCommand;
 }
 
 function mgk_guess_pubkey_path($privateKeyPath) {
