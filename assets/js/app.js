@@ -20,6 +20,7 @@
   var DEFAULT_LOG_VIEW_LINE_LIMIT = 1000;
   var MAX_LOG_VIEW_LINE_LIMIT = 5000;
   var LOG_SEARCH_DEBOUNCE_MS = 320;
+  var MAX_PULL_BATCH_SIZE = 12;
   var CARD_ACTION_HOVER_ANIMATION_CLASSES = [
     'btn-hover-rand-pop',
     'btn-hover-rand-swing',
@@ -509,8 +510,8 @@
     if (!isFinite(maxPull) || maxPull < 1) {
       maxPull = computePullBatchSize();
     }
-    if (maxPull > 1) {
-      maxPull = 1;
+    if (maxPull > MAX_PULL_BATCH_SIZE) {
+      maxPull = MAX_PULL_BATCH_SIZE;
     }
     var inFlightKey = requestPull ? 'fetchingPull' : 'fetchingView';
 
@@ -598,7 +599,26 @@
     if (pullable < 1) {
       return 1;
     }
-    return 1;
+
+    // Smaller UI intervals can process more devices per cycle without feeling stale.
+    var intervalMs = normalizeUiPollMs(state.uiPollMs, defaultUiPollMs);
+    var targetBatch = 2;
+    if (intervalMs <= 500) {
+      targetBatch = 8;
+    } else if (intervalMs <= 1000) {
+      targetBatch = 6;
+    } else if (intervalMs <= 2000) {
+      targetBatch = 4;
+    }
+
+    if (targetBatch < 1) {
+      targetBatch = 1;
+    }
+    if (targetBatch > MAX_PULL_BATCH_SIZE) {
+      targetBatch = MAX_PULL_BATCH_SIZE;
+    }
+
+    return Math.min(pullable, targetBatch);
   }
 
   function triggerPullTick(force) {

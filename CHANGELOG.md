@@ -4,6 +4,16 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.0.5] - 2026-03-06
+
+### Changed
+- Improved dashboard sampling responsiveness with adaptive pull batching in frontend (`assets/js/app.js`).
+- Backend `api/state.php` now supports multi-device pull per request (`max_pull` up to 12) instead of forcing one device only.
+- Added a safe pull time budget per request to keep UI updates fast while increasing sampling throughput.
+
+### Fixed
+- Reduced card refresh lag in environments with multiple `pull_http` / `pull_ssh` devices.
+
 ## [v1.0.4] - 2026-03-06
 
 ### Fixed

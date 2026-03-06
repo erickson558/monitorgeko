@@ -34,18 +34,20 @@ if ($pullParam === '0' || $pullParam === 'false' || $pullParam === 'no' || $pull
 }
 
 $offlineAfterSecondsMin = 45;
-$maxPullPerRequest = 1;
+$maxPullPerRequest = 4;
 if (isset($_GET['max_pull']) && is_numeric($_GET['max_pull'])) {
     $maxPullPerRequest = (int) $_GET['max_pull'];
 }
 if ($maxPullPerRequest < 1) {
     $maxPullPerRequest = 1;
 }
-if ($maxPullPerRequest > 1) {
-    $maxPullPerRequest = 1;
+if ($maxPullPerRequest > 12) {
+    $maxPullPerRequest = 12;
 }
 $pullAttempts = 0;
 $metricsChanged = false;
+$pullWindowSeconds = 2.2;
+$pullStartTs = microtime(true);
 if ($pullEnabled) {
     $nowTs = time();
     $pullCandidates = array();
@@ -109,6 +111,10 @@ if ($pullEnabled) {
     }
 
     for ($candidateIdx = 0; $candidateIdx < count($pullCandidates); $candidateIdx++) {
+        if ($pullAttempts > 0 && (microtime(true) - $pullStartTs) >= $pullWindowSeconds) {
+            break;
+        }
+
         if ($pullAttempts >= $maxPullPerRequest) {
             break;
         }
