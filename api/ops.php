@@ -52,7 +52,7 @@ if ($action === 'events_download') {
     $events = mgk_get_device_events($deviceId, 2000);
     $csv = mgk_events_to_csv($events);
     $safeDevice = preg_replace('/[^a-zA-Z0-9._-]+/', '_', $deviceId);
-    $downloadName = 'monitorgeko-events-' . $safeDevice . '-' . gmdate('Ymd_His') . '.csv';
+    $downloadName = 'monitorapp-events-' . $safeDevice . '-' . gmdate('Ymd_His') . '.csv';
 
     header('Content-Type: text/csv; charset=utf-8');
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');

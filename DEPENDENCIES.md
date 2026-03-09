@@ -17,7 +17,7 @@
 
 ## External tools for SSH pull mode
 
-- One of the following must be available on the server running MonitorGEKO:
+- One of the following must be available on the server running MonitorApp:
 - `plink` (PuTTY)
 - `ssh` (OpenSSH client)
 

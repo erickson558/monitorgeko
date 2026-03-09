@@ -1,19 +1,19 @@
 <?php
 /**
- * Funciones compartidas para MonitorGEKO.
+ * Funciones compartidas para MonitorApp.
  */
 
 date_default_timezone_set('America/Guatemala');
 
-define('MONITORGEKO_ROOT', dirname(__DIR__));
-define('MONITORGEKO_DATA', MONITORGEKO_ROOT . DIRECTORY_SEPARATOR . 'data');
-define('MONITORGEKO_DEVICES_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'devices.json');
-define('MONITORGEKO_METRICS_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'metrics.json');
-define('MONITORGEKO_EVENTS_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'events.json');
-define('MONITORGEKO_HISTORY_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'history.json');
-define('MONITORGEKO_SETTINGS_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . 'settings.json');
-define('MONITORGEKO_SECRET_FILE', MONITORGEKO_DATA . DIRECTORY_SEPARATOR . '.secret');
-define('MONITORGEKO_VERSION_FILE', MONITORGEKO_ROOT . DIRECTORY_SEPARATOR . 'VERSION');
+define('MONITORAPP_ROOT', dirname(__DIR__));
+define('MONITORAPP_DATA', MONITORAPP_ROOT . DIRECTORY_SEPARATOR . 'data');
+define('MONITORAPP_DEVICES_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . 'devices.json');
+define('MONITORAPP_METRICS_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . 'metrics.json');
+define('MONITORAPP_EVENTS_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . 'events.json');
+define('MONITORAPP_HISTORY_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . 'history.json');
+define('MONITORAPP_SETTINGS_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . 'settings.json');
+define('MONITORAPP_SECRET_FILE', MONITORAPP_DATA . DIRECTORY_SEPARATOR . '.secret');
+define('MONITORAPP_VERSION_FILE', MONITORAPP_ROOT . DIRECTORY_SEPARATOR . 'VERSION');
 
 function mgk_get_app_version() {
     static $cachedVersion = null;
@@ -23,12 +23,12 @@ function mgk_get_app_version() {
     }
 
     $defaultVersion = 'v0.1.0';
-    if (!file_exists(MONITORGEKO_VERSION_FILE)) {
+    if (!file_exists(MONITORAPP_VERSION_FILE)) {
         $cachedVersion = $defaultVersion;
         return $cachedVersion;
     }
 
-    $content = @file_get_contents(MONITORGEKO_VERSION_FILE);
+    $content = @file_get_contents(MONITORAPP_VERSION_FILE);
     if ($content === false) {
         $cachedVersion = $defaultVersion;
         return $cachedVersion;
@@ -45,28 +45,28 @@ function mgk_get_app_version() {
 }
 
 function mgk_init_storage() {
-    if (!is_dir(MONITORGEKO_DATA)) {
-        mkdir(MONITORGEKO_DATA, 0775, true);
+    if (!is_dir(MONITORAPP_DATA)) {
+        mkdir(MONITORAPP_DATA, 0775, true);
     }
 
-    if (!file_exists(MONITORGEKO_DEVICES_FILE)) {
-        file_put_contents(MONITORGEKO_DEVICES_FILE, "[]\n", LOCK_EX);
+    if (!file_exists(MONITORAPP_DEVICES_FILE)) {
+        file_put_contents(MONITORAPP_DEVICES_FILE, "[]\n", LOCK_EX);
     }
 
-    if (!file_exists(MONITORGEKO_METRICS_FILE)) {
-        file_put_contents(MONITORGEKO_METRICS_FILE, "{}\n", LOCK_EX);
+    if (!file_exists(MONITORAPP_METRICS_FILE)) {
+        file_put_contents(MONITORAPP_METRICS_FILE, "{}\n", LOCK_EX);
     }
 
-    if (!file_exists(MONITORGEKO_EVENTS_FILE)) {
-        mgk_write_json_file(MONITORGEKO_EVENTS_FILE, array('by_device' => array()));
+    if (!file_exists(MONITORAPP_EVENTS_FILE)) {
+        mgk_write_json_file(MONITORAPP_EVENTS_FILE, array('by_device' => array()));
     }
 
-    if (!file_exists(MONITORGEKO_HISTORY_FILE)) {
-        mgk_write_json_file(MONITORGEKO_HISTORY_FILE, array('by_device' => array()));
+    if (!file_exists(MONITORAPP_HISTORY_FILE)) {
+        mgk_write_json_file(MONITORAPP_HISTORY_FILE, array('by_device' => array()));
     }
 
-    if (!file_exists(MONITORGEKO_SETTINGS_FILE)) {
-        mgk_write_json_file(MONITORGEKO_SETTINGS_FILE, mgk_default_settings());
+    if (!file_exists(MONITORAPP_SETTINGS_FILE)) {
+        mgk_write_json_file(MONITORAPP_SETTINGS_FILE, mgk_default_settings());
     }
 }
 
@@ -139,7 +139,7 @@ function mgk_read_json_body() {
 }
 
 function mgk_get_devices() {
-    $devices = mgk_read_json_file(MONITORGEKO_DEVICES_FILE, array());
+    $devices = mgk_read_json_file(MONITORAPP_DEVICES_FILE, array());
     if (!is_array($devices)) {
         return array();
     }
@@ -155,11 +155,11 @@ function mgk_get_devices() {
 }
 
 function mgk_save_devices($devices) {
-    return mgk_write_json_file(MONITORGEKO_DEVICES_FILE, $devices);
+    return mgk_write_json_file(MONITORAPP_DEVICES_FILE, $devices);
 }
 
 function mgk_get_metrics_store() {
-    $metrics = mgk_read_json_file(MONITORGEKO_METRICS_FILE, array());
+    $metrics = mgk_read_json_file(MONITORAPP_METRICS_FILE, array());
     if (!is_array($metrics)) {
         return array();
     }
@@ -167,11 +167,11 @@ function mgk_get_metrics_store() {
 }
 
 function mgk_save_metrics_store($metrics) {
-    return mgk_write_json_file(MONITORGEKO_METRICS_FILE, $metrics);
+    return mgk_write_json_file(MONITORAPP_METRICS_FILE, $metrics);
 }
 
 function mgk_get_events_store() {
-    $store = mgk_read_json_file(MONITORGEKO_EVENTS_FILE, array('by_device' => array()));
+    $store = mgk_read_json_file(MONITORAPP_EVENTS_FILE, array('by_device' => array()));
     if (!is_array($store)) {
         $store = array('by_device' => array());
     }
@@ -188,11 +188,11 @@ function mgk_save_events_store($store) {
     if (!isset($store['by_device']) || !is_array($store['by_device'])) {
         $store['by_device'] = array();
     }
-    return mgk_write_json_file(MONITORGEKO_EVENTS_FILE, $store);
+    return mgk_write_json_file(MONITORAPP_EVENTS_FILE, $store);
 }
 
 function mgk_get_history_store() {
-    $store = mgk_read_json_file(MONITORGEKO_HISTORY_FILE, array('by_device' => array()));
+    $store = mgk_read_json_file(MONITORAPP_HISTORY_FILE, array('by_device' => array()));
     if (!is_array($store)) {
         $store = array('by_device' => array());
     }
@@ -209,7 +209,7 @@ function mgk_save_history_store($store) {
     if (!isset($store['by_device']) || !is_array($store['by_device'])) {
         $store['by_device'] = array();
     }
-    return mgk_write_json_file(MONITORGEKO_HISTORY_FILE, $store);
+    return mgk_write_json_file(MONITORAPP_HISTORY_FILE, $store);
 }
 
 function mgk_normalize_status_text($value, $fallback) {
@@ -1580,13 +1580,13 @@ function mgk_merge_settings($input, $existing) {
 }
 
 function mgk_get_settings() {
-    $stored = mgk_read_json_file(MONITORGEKO_SETTINGS_FILE, array());
+    $stored = mgk_read_json_file(MONITORAPP_SETTINGS_FILE, array());
     return mgk_merge_settings(array(), $stored);
 }
 
 function mgk_save_settings($settings) {
     $normalized = mgk_merge_settings($settings, mgk_get_settings());
-    return mgk_write_json_file(MONITORGEKO_SETTINGS_FILE, $normalized);
+    return mgk_write_json_file(MONITORAPP_SETTINGS_FILE, $normalized);
 }
 
 function mgk_resolve_device_poll_interval($device, $globalSeconds) {
@@ -1631,20 +1631,20 @@ function mgk_now_iso() {
 }
 
 function mgk_get_secret_key() {
-    $envSecret = getenv('MONITORGEKO_SECRET');
+    $envSecret = getenv('MONITORAPP_SECRET');
     if (is_string($envSecret) && trim($envSecret) !== '') {
         return hash('sha256', $envSecret, true);
     }
 
-    if (!file_exists(MONITORGEKO_SECRET_FILE)) {
+    if (!file_exists(MONITORAPP_SECRET_FILE)) {
         $seed = mgk_random_token(64);
-        file_put_contents(MONITORGEKO_SECRET_FILE, $seed . "\n", LOCK_EX);
+        file_put_contents(MONITORAPP_SECRET_FILE, $seed . "\n", LOCK_EX);
     }
 
-    $fileSecret = trim((string) file_get_contents(MONITORGEKO_SECRET_FILE));
+    $fileSecret = trim((string) file_get_contents(MONITORAPP_SECRET_FILE));
     if ($fileSecret === '') {
         $fileSecret = mgk_random_token(64);
-        file_put_contents(MONITORGEKO_SECRET_FILE, $fileSecret . "\n", LOCK_EX);
+        file_put_contents(MONITORAPP_SECRET_FILE, $fileSecret . "\n", LOCK_EX);
     }
 
     return hash('sha256', $fileSecret, true);
@@ -3511,7 +3511,7 @@ function mgk_ssh_exec_with_cli($device, $remoteCommand) {
 
     $plinkPath = mgk_find_binary(array(
         'plink',
-        MONITORGEKO_ROOT . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'plink.exe',
+        MONITORAPP_ROOT . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'plink.exe',
         'C:\\Program Files\\PuTTY\\plink.exe',
         'C:\\Program Files (x86)\\PuTTY\\plink.exe'
     ));

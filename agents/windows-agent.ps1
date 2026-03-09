@@ -12,7 +12,7 @@ param(
   [string]$Drive = 'C:'
 )
 
-Write-Host "MonitorGEKO Windows agent iniciado para DeviceId=$DeviceId" -ForegroundColor Cyan
+Write-Host "MonitorApp Windows agent iniciado para DeviceId=$DeviceId" -ForegroundColor Cyan
 
 while ($true) {
   try {

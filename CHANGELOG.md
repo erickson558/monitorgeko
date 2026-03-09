@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 The format is inspired by Keep a Changelog and this project follows Semantic Versioning.
 
+## [v1.1.0] - 2026-03-09
+
+### Changed
+- Removed all old brand-term references from source code, runtime identifiers, and public UI labels.
+- Renamed project-facing branding to `MonitorApp`.
+- Updated internal constants and runtime secret env var to `MONITORAPP_*` conventions.
+- Standardized generated event export filename prefix to `monitorapp-events-*`.
+
+### Documentation
+- Updated `README.md` and `DEPENDENCIES.md` naming and operational guidance to match the new project identity.
+- Added explicit GitHub release/versioning best-practice flow aligned to SemVer and `VERSION` as single source of truth.
+
 ## [v1.0.11] - 2026-03-06
 
 ### Fixed

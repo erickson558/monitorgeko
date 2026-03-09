@@ -33,7 +33,7 @@ get_net_bytes_total() {
   awk -F'[: ]+' '/:/{ if ($1 !~ /lo/) { rx += $3; tx += $11 } } END { print rx + tx + 0 }' /proc/net/dev 2>/dev/null
 }
 
-echo "MonitorGEKO Linux agent iniciado para DEVICE_ID=${DEVICE_ID}"
+echo "MonitorApp Linux agent iniciado para DEVICE_ID=${DEVICE_ID}"
 
 while true; do
   net_b1="$(get_net_bytes_total)"

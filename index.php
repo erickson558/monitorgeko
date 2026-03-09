@@ -18,7 +18,7 @@ if (!$jsVersion) {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>MonitorGEKO <?php echo htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8'); ?> | Monitoreo en tiempo real</title>
+  <title>MonitorApp <?php echo htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8'); ?> | Monitoreo en tiempo real</title>
   <link rel="stylesheet" href="assets/css/app.css?v=<?php echo urlencode((string) $cssVersion); ?>"/>
 </head>
 <body>
@@ -29,7 +29,7 @@ if (!$jsVersion) {
     <header class="hero panel">
       <div>
         <p class="eyebrow">NOC Dashboard</p>
-        <h1>MonitorGEKO</h1>
+        <h1>MonitorApp</h1>
         <p class="hint">Version <?php echo htmlspecialchars($appVersion, ENT_QUOTES, 'UTF-8'); ?></p>
         <p class="hero-copy">Monitorea CPU, RAM, Disco y Red en tiempo real. Administra equipos de forma individual y masiva con umbrales por color.</p>
       </div>

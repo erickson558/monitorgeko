@@ -9,11 +9,11 @@
     pollIntervalMs = 5000;
   }
   var DEFAULT_THEME = normalizeTheme(config.themeDefault || 'dark');
-  var THEME_STORAGE_KEY = 'monitorgeko.theme';
-  var UI_POLL_STORAGE_KEY = 'monitorgeko.ui_poll_ms';
-  var CARD_ORDER_STORAGE_KEY = 'monitorgeko.card_order';
-  var CARD_DENSITY_STORAGE_KEY = 'monitorgeko.card_density';
-  var CONTROLS_PANEL_WIDTH_STORAGE_KEY = 'monitorgeko.controls_panel_width';
+  var THEME_STORAGE_KEY = 'monitorapp.theme';
+  var UI_POLL_STORAGE_KEY = 'monitorapp.ui_poll_ms';
+  var CARD_ORDER_STORAGE_KEY = 'monitorapp.card_order';
+  var CARD_DENSITY_STORAGE_KEY = 'monitorapp.card_density';
+  var CONTROLS_PANEL_WIDTH_STORAGE_KEY = 'monitorapp.controls_panel_width';
   var DEFAULT_CONTROLS_PANEL_WIDTH = 390;
   var MIN_CONTROLS_PANEL_WIDTH = 300;
   var MAX_CONTROLS_PANEL_WIDTH = 620;

@@ -1,6 +1,6 @@
-# MonitorGEKO
+# MonitorApp
 
-MonitorGEKO es un dashboard web para monitoreo de equipos en tiempo real con enfoque operativo:
+MonitorApp es un dashboard web para monitoreo de equipos en tiempo real con enfoque operativo:
 
 - Estado de salud por equipo (`green`, `yellow`, `red`)
 - Metricas: CPU, RAM, DISK y RED
@@ -38,7 +38,7 @@ El agente remoto envia metricas al endpoint `api/ingest.php` con `device_id` y `
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\agents\windows-agent.ps1 \
-  -Endpoint "http://TU_SERVIDOR/monitoreos/monitorgeko/api/ingest.php" \
+  -Endpoint "http://TU_SERVIDOR/monitoreos/<tu-proyecto>/api/ingest.php" \
   -DeviceId "ID_DEL_EQUIPO" \
   -Token "TOKEN_DEL_EQUIPO" \
   -IntervalSeconds 5
@@ -48,7 +48,7 @@ powershell -ExecutionPolicy Bypass -File .\agents\windows-agent.ps1 \
 
 ```bash
 bash ./agents/linux-agent.sh \
-  "http://TU_SERVIDOR/monitoreos/monitorgeko/api/ingest.php" \
+  "http://TU_SERVIDOR/monitoreos/<tu-proyecto>/api/ingest.php" \
   "ID_DEL_EQUIPO" \
   "TOKEN_DEL_EQUIPO" \
   5
@@ -71,7 +71,7 @@ Consulta un endpoint HTTP remoto que responde JSON con metricas.
 
 ## `pull_ssh`
 
-El servidor MonitorGEKO entra por SSH y ejecuta comandos remotos en Linux o Windows.
+El servidor MonitorApp entra por SSH y ejecuta comandos remotos en Linux o Windows.
 
 - `ssh_os=linux`: comandos Linux
 - `ssh_os=windows`: PowerShell remoto
@@ -98,7 +98,7 @@ Consulta `DEPENDENCIES.md` para detalle completo de runtime y herramientas.
 ## Seguridad
 
 - Credenciales de equipos cifradas en reposo (`AES-256-CBC`) cuando OpenSSL esta disponible.
-- Clave por variable `MONITORGEKO_SECRET` o archivo local `data/.secret`.
+- Clave por variable `MONITORAPP_SECRET` o archivo local `data/.secret`.
 - Token por equipo para ingesta `push`.
 - Recomendado: restringir acceso web a `data/` y respaldar periodicamente.
 
@@ -118,6 +118,14 @@ Flujo recomendado:
 3. Commit con mensaje de release.
 4. Crear tag (`git tag vX.Y.Z`).
 5. Push branch y tag (`git push origin main` y `git push origin vX.Y.Z`).
+
+## Buenas Practicas En GitHub
+
+- Mantener `main` siempre desplegable (sin commits que rompan runtime).
+- Usar mensajes de commit claros en imperativo (ejemplo: `release: v1.1.0 rename branding to monitorapp`).
+- Hacer un commit por cambio atomico y subir su version asociada en `VERSION`.
+- Crear un tag por release exactamente igual al contenido de `VERSION`.
+- Mantener `CHANGELOG.md` actualizado en cada release con fecha y categorias (`Added`, `Changed`, `Fixed`, `Security`).
 
 ## Licencia
 
